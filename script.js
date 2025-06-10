@@ -1,11 +1,27 @@
-import * as tf from '@tensorflow/tfjs';
-import * as tflite from '@tensorflow/tfjs-tflite';
-
 let model, webcam, canvas, ctx, labelEl;
 
 async function init() {
   model = await tflite.loadTFLiteModel('assets/vidrio_plastico_basura.tflite');
+
   const video = document.getElementById('webcam');
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = stream;
+    await new Promise((resolve) => {
+      video.onloadedmetadata = () => {
+        video.play();
+        resolve();
+      };
+    });
+    webcam = await tf.data.webcam(video);
+  } catch (err) {
+    console.error('🚨 Error al acceder a la cámara:', err);
+    alert('No se pudo acceder a la cámara. Verifica los permisos del navegador.');
+    return;
+  }
+  
+
   webcam = await tf.data.webcam(video);
   labelEl = document.getElementById('label');
   canvas = document.getElementById('canvas');
@@ -16,8 +32,9 @@ async function init() {
 
 async function loop() {
   const img = await webcam.capture();
+
   const resized = tf.tidy(() => img
-    .resizeBilinear([100,100])
+    .resizeBilinear([100, 100])
     .mean(2)
     .expandDims(2)
     .expandDims(0)
@@ -27,9 +44,10 @@ async function loop() {
 
   const output = model.predict(resized);
   const scores = await output.data();
-  const labels = ['glass','plastic','trash'];
+
+  const labels = ['glass', 'plastic', 'trash'];
   const idx = scores.indexOf(Math.max(...scores));
-  labelEl.innerText = `${labels[idx]} (${(scores[idx]*100).toFixed(2)}%)`;
+  labelEl.innerText = `${labels[idx]} (${(scores[idx] * 100).toFixed(2)}%)`;
 
   canvas.width = img.shape[1];
   canvas.height = img.shape[0];
@@ -41,3 +59,7 @@ async function loop() {
 
   requestAnimationFrame(loop);
 }
+
+init();
+window.init = init;
+document.getElementById('startBtn').addEventListener('click', init);

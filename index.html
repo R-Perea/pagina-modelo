@@ -1,14 +1,34 @@
-<div class="card">
-  <div class="card-header">
-    <h2>Clasificador de vidrio/plastico</h2>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Clasificador de vidrio/plástico</title>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <h2>Clasificador de vidrio/plástico</h2>
+    </div>
+    <div class="card-body">
+      <video id="webcam" autoplay playsinline width="224" height="224"></video>
+      <canvas id="canvas"></canvas>
+      <div id="label"></div>
+      
+      <div><strong>Resultado:</strong> <span id="label">cargando...</span></div>
+    </div>
+    <div class="card-footer">
+      <button id="startBtn">Iniciar</button>
+    </div>
   </div>
-  <div class="card-body">
-    <video id="webcam" autoplay playsinline width="300" height="300"></video>
-    <canvas id="canvas"></canvas>
-    <div><strong>Resultado:</strong> <span id="label">cargando...</span></div>
-  </div>
-  <div class="card-footer">
-    <button onclick="init()">Iniciar</button>
-  </div>
-</div>
-<script type="module" src="script.js"></script>
+
+  
+ <!-- Import @tensorflow/tfjs-core -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
+<!-- Adds the CPU backend -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-cpu"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite/dist/tf-tflite.min.js"></script>
+  
+  <script src="script.js"></script>
+</body>
+</html>
