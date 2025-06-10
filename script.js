@@ -1,35 +1,40 @@
-const video = document.getElementById('webcam');
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
+(async () => {
+  const video = document.getElementById('webcam');
+  await tf.ready();
+  const model = await tflite.loadTFLiteModel(
+    'https://cdn.jsdelivr.net/gh/<usuario>/<repo>@main/assets/vidrio_plastico_basura.tflite'
+  );
 
-// 1) Carga del modelo
-const model = await tflite.loadTFLiteModel('assets/vidrio_plastico_basura.tflite');
+  const cam = await tf.data.webcam(video);
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const snapshotEl = document.getElementById('snapshot');
+  const labelEl = document.getElementById('label');
+  const labels = ['glass', 'plastic', 'trash'];
 
+  async function predictFrame() {
+    const img = await cam.capture(); // tf.Tensor3D
+    const resized = tf.image.resizeBilinear(img, [100, 100])
+                      .expandDims(0)
+                      .toFloat()
+                      .div(255);
 
-// 2) Activa webcam
-const webcam = await tf.data.webcam(video);
+    const tfliteOut = await model.predict(resized);
+    const confidences = tfliteOut.dataSync();
+    const max = confidences.indexOf(Math.max(...confidences));
 
-// 3) Ciclo de inferencia
-async function predictLoop() {
-  const img = await webcam.capture();
-  const input = tf.browser
-    .fromPixels(img)
-    .resizeBilinear([100, 100])
-    .mean(2)        // convierte a gris
-    .expandDims(2)  // añade canal
-    .expandDims(0)  // añade batch
-    .toFloat()
-    .div(255);
+    labelEl.textContent = `${labels[max]} ${(confidences[max] * 100).toFixed(2)}%`;
 
-  const output = model.predict(input);
-  const confidences = await output.data();
-  console.log('Confidences:', confidences);
+    // Dibuja fotograma estilizado en canvas
+    const [w, h] = [video.videoWidth, video.videoHeight];
+    canvas.width = w; canvas.height = h;
+    ctx.drawImage(video, 0, 0, w, h);
+    snapshotEl.src = canvas.toDataURL('image/jpeg');
 
-  img.dispose();
-  input.dispose();
-  output.dispose();
+    img.dispose();
+    resized.dispose();
+    requestAnimationFrame(predictFrame);
+  }
 
-  requestAnimationFrame(predictLoop);
-}
-
-predictLoop();
+  predictFrame();
+})();
