@@ -41,3 +41,5 @@ async function loop() {
 
   requestAnimationFrame(loop);
 }
+
+window.addEventListener('load', init);
