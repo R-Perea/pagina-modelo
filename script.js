@@ -14,15 +14,13 @@ async function init() {
         resolve();
       };
     });
-    webcam = await tf.data.webcam(video);
+    webcam = await tf.data.webcam(video); // Esta línea es suficiente
   } catch (err) {
     console.error('🚨 Error al acceder a la cámara:', err);
     alert('No se pudo acceder a la cámara. Verifica los permisos del navegador.');
     return;
   }
-  
 
-  webcam = await tf.data.webcam(video);
   labelEl = document.getElementById('label');
   canvas = document.getElementById('canvas');
   ctx = canvas.getContext('2d');
