@@ -60,10 +60,6 @@ async function loop() {
   requestAnimationFrame(loop);
 }
 
-<<<<<<< HEAD
 init();
 window.init = init;
 document.getElementById('startBtn').addEventListener('click', init);
-=======
-window.addEventListener('load', init);
->>>>>>> 6367d99eb47c5f7861d98b76afdb086d9baaccb3
