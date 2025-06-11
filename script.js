@@ -5,7 +5,6 @@ async function init() {
 
   const video = document.getElementById('webcam');
 
-  try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     video.srcObject = stream;
     await new Promise((resolve) => {
@@ -15,11 +14,7 @@ async function init() {
       };
     });
     webcam = await tf.data.webcam(video); // Esta línea es suficiente
-  } catch (err) {
-    console.error('🚨 Error al acceder a la cámara:', err);
-    alert('No se pudo acceder a la cámara. Verifica los permisos del navegador.');
-    return;
-  }
+ 
 
   labelEl = document.getElementById('label');
   canvas = document.getElementById('canvas');
